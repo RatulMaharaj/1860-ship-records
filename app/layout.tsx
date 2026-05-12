@@ -17,24 +17,66 @@ const inter = Inter({
   display: "swap",
 });
 
+const SITE_URL = "https://1860.ratulmaharaj.com";
+const SITE_TITLE = "Indentured Ship Records, 1860–1911";
+const SITE_DESCRIPTION =
+  "Search the records of 152,240 indentured passengers who arrived at Port Natal between 1860 and 1911, sourced from the Gandhi-Luthuli Documentation Centre at UKZN.";
+
 export const metadata: Metadata = {
-  title: "Indentured Ship Records, 1860–1911",
-  description:
-    "Search the Gandhi-Luthuli Documentation Centre's records of 152,240 indentured passengers who arrived at Port Natal between 1860 and 1911.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: `%s · ${SITE_TITLE}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "1860 Indentured Ship Records",
+  authors: [{ name: "Ratul Maharaj", url: "https://ratulmaharaj.com" }],
+  creator: "Ratul Maharaj",
+  keywords: [
+    "indentured labour",
+    "indentured immigrants",
+    "Natal",
+    "South Africa",
+    "India",
+    "1860",
+    "1911",
+    "Port Natal",
+    "Durban",
+    "Gandhi-Luthuli Documentation Centre",
+    "UKZN",
+    "passenger records",
+    "ship records",
+    "genealogy",
+    "Indian diaspora",
+  ],
   icons: {
     icon: "https://fav.farm/%F0%9F%9A%A2",
   },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Indentured Ship Records, 1860–1911",
-    description:
-      "Search the records of 152,240 indentured passengers who arrived at Port Natal between 1860 and 1911.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_TITLE,
     type: "website",
+    locale: "en_ZA",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Indentured Ship Records, 1860–1911",
-    description:
-      "Search the records of 152,240 indentured passengers who arrived at Port Natal between 1860 and 1911.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb, type Passenger } from "@/lib/db";
@@ -6,6 +7,62 @@ import { titleCase } from "@/lib/format";
 // Historical data is immutable — cache each rendered page forever.
 export const revalidate = false;
 export const dynamicParams = true;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const n = parseInt(id, 10);
+  if (!Number.isFinite(n)) return { title: "Passenger not found" };
+
+  const row = getDb()
+    .prepare("SELECT * FROM passengers WHERE indenture_no = ?")
+    .get(n) as Passenger | undefined;
+  if (!row) return { title: "Passenger not found" };
+
+  const displayName = row.name ? titleCase(row.name) : "Unknown passenger";
+  const title = `${displayName} — Indenture No. ${row.indenture_no.toLocaleString()}`;
+
+  const bits: string[] = [];
+  if (row.ship_name) {
+    bits.push(
+      `${titleCase(row.ship_name)}${row.ship_voyage ? ` ${row.ship_voyage}` : ""}`,
+    );
+  }
+  if (row.arrival_month && row.arrival_year) {
+    bits.push(`${row.arrival_month} ${row.arrival_year}`);
+  } else if (row.arrival_year) {
+    bits.push(String(row.arrival_year));
+  }
+  if (row.embarkation_port) bits.push(`from ${titleCase(row.embarkation_port)}`);
+  if (row.village || row.zillah) {
+    bits.push(
+      `origin ${[titleCase(row.village ?? ""), titleCase(row.zillah ?? "")]
+        .filter(Boolean)
+        .join(", ")}`,
+    );
+  }
+  const description = `Indentured passenger record from the Natal register, 1860–1911. ${bits.join(" · ")}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/passenger/${row.indenture_no}` },
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      url: `/passenger/${row.indenture_no}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 type FieldDef = { key: keyof Passenger; label: string; longLabel?: string };
 
