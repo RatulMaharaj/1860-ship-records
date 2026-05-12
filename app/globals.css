@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  /* Indian saffron — the orange present in the Indian flag, absent in the South African flag. */
+  --color-primary: #FE661D;
+  --color-primary-soft: #FFF1E8;
+  --color-primary-ring: rgba(254, 102, 29, 0.22);
+  --color-accent: oklch(77% 0.152 181.9);
+  --color-secondary: oklch(65% 0.241 354.3);
+  --color-success: oklch(76% 0.177 163.2);
+  --color-warning: oklch(82% 0.189 84.4);
+  --color-info: oklch(74% 0.16 232.7);
+  --color-error: oklch(71% 0.194 13.4);
+
+  --color-base-100: #ffffff;
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(15% 0.01 270);
+
+  /* Figma-style neutral canvas gray, slightly lighter than Figma's #E5E5E5. */
+  --color-cream: #ededed;
+
+  --background: var(--color-cream);
+  --foreground: var(--color-base-content);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--color-primary);
+  --color-brand-soft: var(--color-primary-soft);
+  --color-brand-accent: var(--color-accent);
+  --font-serif: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-sans:
+    var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+html, body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-serif);
+  font-feature-settings: "kern", "liga", "calt", "onum";
+}
+
+/* Sans for UI chrome where serif feels heavy (small labels, controls, numbers). */
+input, select, textarea, button, .ui-sans, .tabular-nums {
+  font-family: var(--font-sans);
+}
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
