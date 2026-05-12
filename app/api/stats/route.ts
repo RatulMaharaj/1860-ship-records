@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
     )
     .get(...args) as { min_y: number | null; max_y: number | null };
 
-  return NextResponse.json({
+  const body = {
     total: totalRow.c,
     age: ageRow,
     year_range: yearRangeRow,
@@ -91,5 +91,11 @@ export async function GET(req: NextRequest) {
     by_ship: breakdown("ship_name", 5),
     by_year: breakdown("arrival_year", 10),
     by_zillah: breakdown("zillah", 5),
+  };
+
+  return NextResponse.json(body, {
+    headers: {
+      "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+    },
   });
 }

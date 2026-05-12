@@ -71,5 +71,13 @@ export async function GET(req: NextRequest) {
     )
     .all(...args, limit, offset) as Passenger[];
 
-  return NextResponse.json({ total: totalRow.c, limit, offset, results });
+  return NextResponse.json(
+    { total: totalRow.c, limit, offset, results },
+    {
+      headers: {
+        // Historical data never changes — let CDNs/browsers cache forever.
+        "Cache-Control": "public, max-age=31536000, s-maxage=31536000, immutable",
+      },
+    },
+  );
 }

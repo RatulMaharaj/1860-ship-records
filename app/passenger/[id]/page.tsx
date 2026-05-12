@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb, type Passenger } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+// Historical data is immutable — cache each rendered page forever.
+export const revalidate = false;
+export const dynamicParams = true;
 
 type FieldDef = { key: keyof Passenger; label: string };
 
