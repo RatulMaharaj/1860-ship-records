@@ -20,7 +20,22 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Indentured Ship Records, 1860–1911",
   description:
-    "Search the Gandhi-Luthuli Documentation Centre's records of indentured passengers arriving in Natal between 1860 and 1911.",
+    "Search the Gandhi-Luthuli Documentation Centre's records of 152,240 indentured passengers who arrived at Port Natal between 1860 and 1911.",
+  icons: {
+    icon: "https://fav.farm/%F0%9F%9A%A2",
+  },
+  openGraph: {
+    title: "Indentured Ship Records, 1860–1911",
+    description:
+      "Search the records of 152,240 indentured passengers who arrived at Port Natal between 1860 and 1911.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Indentured Ship Records, 1860–1911",
+    description:
+      "Search the records of 152,240 indentured passengers who arrived at Port Natal between 1860 and 1911.",
+  },
 };
 
 export default function RootLayout({

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import type { Passenger } from "@/lib/db";
+import type { ReactNode } from "react";
 import { SearchableSelect } from "./SearchableSelect";
 import { InfoLabel } from "./InfoLabel";
 
@@ -113,8 +114,9 @@ export default function Home() {
   const totalPages = data ? Math.max(1, Math.ceil(data.total / LIMIT)) : 1;
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream)] text-zinc-900 overflow-x-hidden">
-      <header className="border-b border-zinc-200 bg-white">
+    <div className="min-h-screen bg-[var(--color-cream)] text-zinc-900">
+      <div className="sm:sticky sm:top-0 sm:z-20">
+      <header className="sticky top-0 z-20 sm:static sm:z-auto border-b border-zinc-200 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 sm:py-4 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-base sm:text-lg font-semibold tracking-tight leading-tight">
@@ -122,7 +124,7 @@ export default function Home() {
               <span className="italic font-normal">1860–1911</span>
             </h1>
             <p className="ui-sans text-[10px] sm:text-xs text-zinc-500 mt-1 uppercase tracking-wider">
-              Gandhi-Luthuli Documentation Centre, UKZN
+              Data from the Gandhi-Luthuli Documentation Centre, UKZN
             </p>
           </div>
           <a
@@ -147,32 +149,44 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4">
-        {/* Search + filters */}
-        <section className="border border-zinc-200 bg-white p-3 sm:p-4 space-y-3">
+      <div className="bg-[var(--color-cream)] border-b border-zinc-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-3 pb-3 sm:pt-4 sm:pb-4">
+          {/* Search + filters */}
+          <section className="border border-zinc-200 bg-white p-3 sm:p-4 space-y-3">
           <div>
             <div className="flex items-baseline justify-between mb-1">
               <div className="text-xs font-semibold uppercase text-zinc-500">
                 <InfoLabel label="Search" docKey="search" />
               </div>
-              <label className="flex items-center gap-1.5 text-xs text-zinc-600 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={exact}
-                  onChange={(e) => setExact(e.target.checked)}
-                  className="h-3.5 w-3.5 accent-[var(--color-primary)]"
-                />
-                Exact match only
+              <label className="flex items-center gap-2 text-xs text-zinc-600 cursor-pointer select-none">
+                <span>Exact match only</span>
+                <span className="relative inline-flex h-4 w-7 shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={exact}
+                    onChange={(e) => setExact(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 rounded-full bg-zinc-300 peer-checked:bg-[var(--color-primary)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-primary-ring)] transition-colors"
+                  />
+                  <span
+                    aria-hidden
+                    className="absolute top-0.5 left-0.5 h-3 w-3 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-3"
+                  />
+                </span>
               </label>
             </div>
             <input
-              type="search"
+              type="text"
+              inputMode="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={
                 exact
-                  ? "exact phrase, e.g. RAMASAMY"
-                  : "name, village, employer, remarks…"
+                  ? "Exact phrase, e.g. DAVARUM"
+                  : "Name, village, employer, remarks…"
               }
               className="w-full border border-zinc-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
             />
@@ -203,8 +217,12 @@ export default function Home() {
               </button>
             )}
           </div>
-        </section>
+          </section>
+        </div>
+      </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4">
         {/* Stats */}
         {stats && stats.total > 0 && (
           <section className="space-y-4">
@@ -266,41 +284,79 @@ export default function Home() {
               </li>
             )}
             {!loading &&
-              data?.results.map((r) => (
-                <li key={r.indenture_no}>
-                  <Link
-                    href={`/passenger/${r.indenture_no}`}
-                    className="block px-4 py-3 active:bg-zinc-100"
-                  >
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-medium text-sm uppercase">
-                        {r.name ?? "(unknown)"}
-                      </span>
-                      <span className="font-mono text-xs text-zinc-500">
-                        #{r.indenture_no}
-                      </span>
-                    </div>
-                    <div className="text-xs text-zinc-600 mt-0.5 uppercase">
-                      {[
-                        r.sex,
-                        r.age_yr != null ? `${r.age_yr}y` : null,
-                        r.village,
-                        r.zillah,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </div>
-                    <div className="text-xs text-zinc-500 mt-0.5 uppercase">
-                      {r.ship_name}
-                      {r.ship_voyage && (
-                        <span className="text-zinc-400"> {r.ship_voyage}</span>
-                      )}
-                      {" · "}
-                      {r.arrival_month} {r.arrival_year} · {r.embarkation_port}
-                    </div>
-                  </Link>
-                </li>
-              ))}
+              data?.results.map((r) => {
+                const fields: { label: string; value: string | null }[] = [
+                  {
+                    label: "Age",
+                    value:
+                      r.age_yr != null
+                        ? `${r.age_yr}${r.age_mo ? ` ${r.age_mo}m` : ""} ${r.age_yr === 1 ? "year" : "years"}`
+                        : null,
+                  },
+                  { label: "Sex", value: r.sex },
+                  {
+                    label: "Ship",
+                    value: r.ship_name
+                      ? `${r.ship_name}${r.ship_voyage ? ` ${r.ship_voyage}` : ""}`
+                      : null,
+                  },
+                  {
+                    label: "Arrived",
+                    value:
+                      r.arrival_month && r.arrival_year
+                        ? `${r.arrival_month} ${r.arrival_year}`
+                        : null,
+                  },
+                  { label: "Port", value: r.embarkation_port },
+                  { label: "Village", value: r.village },
+                  { label: "Zillah", value: r.zillah },
+                  { label: "Employer", value: r.employer },
+                ];
+                const visible = fields.filter((f) => f.value);
+                return (
+                  <li key={r.indenture_no} className="odd:bg-white even:bg-zinc-50/70">
+                    <Link
+                      href={`/passenger/${r.indenture_no}`}
+                      className="relative block px-4 py-3 pr-9 active:bg-[#fff4ec]"
+                    >
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="font-medium text-sm uppercase">
+                          {r.name ?? "(unknown)"}
+                        </span>
+                        <span className="ui-sans font-mono text-xs text-zinc-500">
+                          #{r.indenture_no}
+                        </span>
+                      </div>
+                      <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2">
+                        {visible.map((f) => (
+                          <div key={f.label} className="min-w-0">
+                            <dt className="ui-sans text-[9px] font-semibold uppercase tracking-widest text-zinc-500">
+                              {f.label}
+                            </dt>
+                            <dd className="text-xs text-zinc-800 uppercase break-words leading-snug mt-0.5">
+                              {f.value}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
+                      <svg
+                        aria-hidden
+                        viewBox="0 0 12 12"
+                        className="absolute right-3 bottom-3 w-3.5 h-3.5 text-zinc-400"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <path
+                          d="M4 2.5l4 3.5-4 3.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Link>
+                  </li>
+                );
+              })}
           </ul>
 
           {/* Desktop table */}
@@ -379,27 +435,30 @@ export default function Home() {
                       key={r.indenture_no}
                       className="odd:bg-white even:bg-zinc-50/70 hover:bg-[#fff4ec] transition-colors"
                     >
-                      <td className="px-3 py-2 font-mono text-xs truncate">
+                      <HoverCell
+                        tip={String(r.indenture_no)}
+                        className="font-mono text-xs"
+                      >
                         <Link
                           href={`/passenger/${r.indenture_no}`}
                           className="text-[var(--color-primary)] hover:underline"
                         >
                           {r.indenture_no}
                         </Link>
-                      </td>
-                      <td
-                        className="px-3 py-2 font-medium truncate"
-                        title={r.name ?? undefined}
-                      >
+                      </HoverCell>
+                      <HoverCell tip={r.name} className="font-medium">
                         {r.name}
-                      </td>
-                      <td className="px-3 py-2 truncate">{r.age_yr ?? ""}</td>
-                      <td className="px-3 py-2 truncate">{r.sex ?? ""}</td>
-                      <td
-                        className="px-3 py-2 truncate"
-                        title={
+                      </HoverCell>
+                      <HoverCell tip={r.age_yr != null ? String(r.age_yr) : null}>
+                        {r.age_yr ?? ""}
+                      </HoverCell>
+                      <HoverCell tip={r.sex}>
+                        {r.sex ? r.sex.charAt(0) : ""}
+                      </HoverCell>
+                      <HoverCell
+                        tip={
                           [r.ship_name, r.ship_voyage].filter(Boolean).join(" ") ||
-                          undefined
+                          null
                         }
                       >
                         {r.ship_name}
@@ -408,34 +467,23 @@ export default function Home() {
                             {r.ship_voyage}
                           </span>
                         )}
-                      </td>
-                      <td className="px-3 py-2 whitespace-nowrap truncate">
+                      </HoverCell>
+                      <HoverCell
+                        tip={
+                          r.arrival_month && r.arrival_year
+                            ? `${r.arrival_month} ${r.arrival_year}`
+                            : null
+                        }
+                        className="whitespace-nowrap"
+                      >
                         {r.arrival_month} {r.arrival_year}
-                      </td>
-                      <td
-                        className="px-3 py-2 truncate"
-                        title={r.embarkation_port ?? undefined}
-                      >
+                      </HoverCell>
+                      <HoverCell tip={r.embarkation_port}>
                         {r.embarkation_port}
-                      </td>
-                      <td
-                        className="px-3 py-2 truncate"
-                        title={r.village ?? undefined}
-                      >
-                        {r.village ?? ""}
-                      </td>
-                      <td
-                        className="px-3 py-2 truncate"
-                        title={r.zillah ?? undefined}
-                      >
-                        {r.zillah ?? ""}
-                      </td>
-                      <td
-                        className="px-3 py-2 truncate"
-                        title={r.employer ?? undefined}
-                      >
-                        {r.employer ?? ""}
-                      </td>
+                      </HoverCell>
+                      <HoverCell tip={r.village}>{r.village ?? ""}</HoverCell>
+                      <HoverCell tip={r.zillah}>{r.zillah ?? ""}</HoverCell>
+                      <HoverCell tip={r.employer}>{r.employer ?? ""}</HoverCell>
                     </tr>
                   ))}
               </tbody>
@@ -550,5 +598,30 @@ function Breakdown({
         })}
       </ul>
     </div>
+  );
+}
+
+function HoverCell({
+  tip,
+  className = "",
+  children,
+}: {
+  tip: string | null | undefined;
+  className?: string;
+  children: ReactNode;
+}) {
+  const text = tip ?? "";
+  return (
+    <td className={`px-3 py-2 relative group/cell ${className}`}>
+      <div className="truncate">{children}</div>
+      {text && (
+        <span
+          role="tooltip"
+          className="pointer-events-none invisible opacity-0 group-hover/cell:visible group-hover/cell:opacity-100 absolute z-30 left-2 top-full mt-1 max-w-xs whitespace-normal break-words bg-zinc-900 text-white text-[11px] leading-snug px-2 py-1.5 shadow-lg normal-case tracking-normal font-normal ui-sans transition-opacity duration-75"
+        >
+          {text}
+        </span>
+      )}
+    </td>
   );
 }

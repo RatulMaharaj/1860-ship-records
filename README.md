@@ -47,7 +47,7 @@ zillah (district), thanna (sub-district), village, ship, voyage number,
 arrival month/year, embarkation port, employer, outcome, and remarks.
 
 The source `Arrival` column packs date, ship and port into one string; the
-build script parses it into structured fields. Two of ~152,273 rows have
+build script parses it into structured fields. Two of ~152,240 rows have
 non-standard arrival strings and are kept verbatim.
 
 ## Stack
